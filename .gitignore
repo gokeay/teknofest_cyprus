@@ -1,5 +1,6 @@
 # Sanal ortam
 venv/
+myenv/
 
 # Ortam değişkenleri
 .env
