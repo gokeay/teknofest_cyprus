@@ -8,8 +8,15 @@ from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
-if not User.objects.filter(username="admin").exists():
-    User.objects.create_superuser("admin", "admin@example.com", "admin123")
-    print("Superuser created.")
+# TC numarası ile admin kullanıcısı var mı kontrol et, yoksa oluştur
+if not User.objects.filter(username="11111111112").exists():
+    User.objects.create_superuser(
+        username="11111111112",  # TC numarasını kullanıcı adı olarak kullanıyoruz
+        email="admin@example.com",  # E-posta isteğe bağlı, genellikle boş bırakılabilir
+        password="alskZM10.",
+        first_name="Admin",
+        last_name="User",
+    )
+    print("Superuser created with TC: 11111111112, password: alskZM10.")
 else:
     print("Superuser already exists.")
