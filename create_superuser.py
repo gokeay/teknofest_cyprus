@@ -9,9 +9,9 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 
 # TC numarası ile admin kullanıcısı var mı kontrol et, yoksa oluştur
-if not User.objects.filter(username="11111111112").exists():
+if not User.objects.filter(tc="11111111112").exists():
     User.objects.create_superuser(
-        username="11111111112",  # TC numarasını kullanıcı adı olarak kullanıyoruz
+        tc="11111111112",  # TC numarasını kullanıcı adı olarak kullanıyoruz
         email="admin@example.com",  # E-posta isteğe bağlı, genellikle boş bırakılabilir
         password="alskZM10.",
         first_name="Admin",
