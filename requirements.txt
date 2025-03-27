@@ -15,7 +15,6 @@ greenlet==3.1.1
 h2==4.2.0
 HTMLParser==0.0.2
 importlib_metadata==8.6.1
-importlib_metadata==8.0.0
 inotify==0.2.10
 ipdb==0.13.13
 ipython==9.0.2
