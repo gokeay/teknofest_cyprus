@@ -32,7 +32,7 @@ veriler = [
     {
         "tc": "13120019760",
         "isim": "Ebrar",
-        "soyisim": "Özata",
+        "soyisim": "Ozata",
         "role": "t3 personel",
         "koord": "Mimari Tasarım  Koordinatörlüğü",
         "password": "Ebrar123.",
@@ -40,8 +40,8 @@ veriler = [
     },
     {
         "tc": "13532141066",
-        "isim": "Şevval",
-        "soyisim": "Çelik",
+        "isim": "Sevval",
+        "soyisim": "Celik",
         "role": "t3 personel",
         "koord": "Yarışmalar Koordinatörlüğü",
         "password": "TY123456",
@@ -59,7 +59,7 @@ veriler = [
     {
         "tc": "69016104232",
         "isim": "Bahar",
-        "soyisim": "Kılıç",
+        "soyisim": "Kilic",
         "role": "t3 personel",
         "koord": "İdari İşler Koordinatörlüğü",
         "password": "bK104232",
@@ -67,7 +67,7 @@ veriler = [
     },
     {
         "tc": "60898371170",
-        "isim": "Tuğçe",
+        "isim": "Tugce",
         "soyisim": "Alemdar",
         "role": "t3 personel",
         "koord": "Satış ve Pazarlama  Koordinatörlüğü",
@@ -85,7 +85,7 @@ veriler = [
     },
     {
         "tc": "12955082888",
-        "isim": "Ayşenur",
+        "isim": "Aysenur",
         "soyisim": "Yavuz",
         "role": "t3 personel",
         "koord": "Deneyap Koordinatörlüğü",
@@ -95,7 +95,7 @@ veriler = [
     {
         "tc": "41683520324",
         "isim": "Burak",
-        "soyisim": "Altıntaş",
+        "soyisim": "Altintaş",
         "role": "t3 personel",
         "koord": "Girişim Koordinatörlüğü",
         "password": "B123456789",
@@ -106,7 +106,7 @@ veriler = [
         "isim": "Emre",
         "soyisim": "Verim",
         "role": "t3 personel",
-        "koord": "Ulaşım Koordinatörlüğü",
+        "koord": "Ulaşim Koordinatörlüğü",
         "password": "Everim554546",
         "birim": ["T3 Personel", "İl ve Deneyap Sorumlusu"]
     },
