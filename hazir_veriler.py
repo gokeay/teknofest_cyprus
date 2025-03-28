@@ -7,7 +7,7 @@ veriler = [
         "isim": "Emirhan",
         "soyisim": "Ali zafer",
         "role": "t3 personel",
-        "koord": "TEKNOFEST  Operasyon Koordinatörlüğü",
+        "koord": "Operasyon Koordinatörlüğü",
         "password": "TFCyprus1.",
         "birim": ["T3 Personel", "İl ve Deneyap Sorumlusu"]
     },
@@ -16,7 +16,7 @@ veriler = [
         "isim": "Fatma",
         "soyisim": "Nur tip",
         "role": "t3 personel",
-        "koord": "TEKNOFEST   Fuar Koordinatörlüğü",
+        "koord": "Fuar Koordinatörlüğü",
         "password": "TEKNOFEST2025",
         "birim": ["T3 Personel", "İl ve Deneyap Sorumlusu"]
     },
@@ -43,7 +43,7 @@ veriler = [
         "isim": "Şevval",
         "soyisim": "Çelik",
         "role": "t3 personel",
-        "koord": "TEKNOFEST  Yarışmalar Koordinatörlüğü",
+        "koord": "Yarışmalar Koordinatörlüğü",
         "password": "TY123456",
         "birim": ["T3 Personel", "İl ve Deneyap Sorumlusu"]
     },
