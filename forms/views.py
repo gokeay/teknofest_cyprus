@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.utils import timezone
+from datetime import time
 from .models import (
     T3PersonelAtama, 
     T3PersonelVeriler, 
@@ -97,33 +98,71 @@ def t3personel_form(request):
     """T3 personel sipariş formu"""
     log_user_action(request, 'T3 Personel Form Sayfası Görüntülendi', 'T3 Personel Form')
     
-    # Kullanıcıya atanmış koordinatörlük ve birimleri al
-    atamalar = T3PersonelAtama.objects.filter(kisi=request.user)
+    user = request.user
+    atamalar = T3PersonelAtama.objects.filter(kisi=user)
+    bugun = timezone.now().date()
+    simdi = timezone.now().time()
     
+    # Saat 14:00'dan önce mi kontrol et
+    saat_uygun = simdi < time(22, 0)
+
+    # Güncelleme modu kontrolü
+    guncelleme_modu = request.session.get('t3personel_guncelleme_modu', False)
+    
+    # Daha önce aynı gün veri gönderilmişse onları çek
+    bugunku_kayitlar = None if guncelleme_modu else T3PersonelVeriler.objects.filter(kisi=user, submitteddate=bugun)
+
     if not atamalar.exists():
         messages.warning(request, 'Henüz size atanmış koordinatörlük ve birim bulunmamaktadır.')
-    
+
     if request.method == 'POST':
+        # Eğer güncelleme modundaysak veya bugün kayıt yoksa
+        if guncelleme_modu:
+            # Önce eski kayıtları sil
+            T3PersonelVeriler.objects.filter(kisi=user, submitteddate=bugun).delete()
+            # Güncelleme modunu kapat
+            request.session['t3personel_guncelleme_modu'] = False
+            
+        # Yeni verileri ekle
         for atama in atamalar:
             siparis_key = f'siparis_{atama.id}'
             siparis_sayisi = request.POST.get(siparis_key)
-            
+
             if siparis_sayisi and siparis_sayisi.isdigit():
                 T3PersonelVeriler.objects.create(
-                    kisi=request.user,
+                    kisi=user,
                     koordinatorluk=atama.koordinatorluk,
                     birim=atama.birim,
                     siparis_sayisi=int(siparis_sayisi)
                 )
-        
+
         log_user_action(request, 'T3 Personel Formu Gönderildi', 'T3 Personel Form')
         messages.success(request, 'Sipariş bilgileriniz başarıyla kaydedildi.')
         return redirect('forms:t3personel_form')
-    
+
     context = {
-        'atamalar': atamalar
+        'atamalar': atamalar,
+        'bugunku_kayitlar': bugunku_kayitlar,
+        'saat_uygun': saat_uygun,
+        'guncelleme_modu': guncelleme_modu
     }
     return render(request, 'forms/t3personel_form.html', context)
+
+@login_required
+@role_required(['t3personel'])
+def t3personel_form_guncelle(request):
+    """T3 personel verilerini güncelleme modu"""
+    simdi = timezone.now().time()
+    
+    # Saat 14:00'dan önce mi kontrol et
+    if simdi >= time(22, 0):
+        messages.error(request, 'Veri güncelleme için son saat 14:00\'tır. Şu an güncelleme yapamazsınız.')
+        return redirect('forms:t3personel_form')
+    
+    # Güncelleme modunu aç
+    request.session['t3personel_guncelleme_modu'] = True
+    messages.info(request, 'Veri güncelleme modundasınız. Lütfen yeni değerleri girin.')
+    return redirect('forms:t3personel_form')
 
 @login_required
 @role_required(['sorumlu'])
@@ -150,3 +189,5 @@ def sorumlu_form(request):
             messages.error(request, f'Bir hata oluştu: {str(e)}')
     
     return render(request, 'forms/sorumlu_form.html')
+
+
