@@ -10,7 +10,8 @@ from forms.models import (
     T3PersonelVeriler, 
     GonulluDurumVeriler, 
     GonulluSorunVeriler, 
-    SorumluVeriler
+    SorumluVeriler,
+    SistemAyarlari
 )
 from forms.views import role_required
 from accounts.views import log_user_action
@@ -34,6 +35,17 @@ def dashboard_home(request):
     toplam_taseron_siparis = SorumluVeriler.objects.filter(submitteddate__gte=son_7_gun).aggregate(Sum('taseron_yemek_siparis'))['taseron_yemek_siparis__sum'] or 0
     toplam_t3_siparis = T3PersonelVeriler.objects.filter(submitteddate__gte=son_7_gun).aggregate(Sum('siparis_sayisi'))['siparis_sayisi__sum'] or 0
     
+    # Sistem ayarlarını al
+    try:
+        veri_guncelleme_son_saat = int(SistemAyarlari.objects.get(anahtar='veri_guncelleme_son_saat').deger)
+    except (SistemAyarlari.DoesNotExist, ValueError):
+        veri_guncelleme_son_saat = 14  # Varsayılan değer
+        
+    try:
+        veri_guncelleme_son_dakika = int(SistemAyarlari.objects.get(anahtar='veri_guncelleme_son_dakika').deger)
+    except (SistemAyarlari.DoesNotExist, ValueError):
+        veri_guncelleme_son_dakika = 0  # Varsayılan değer
+    
     context = {
         't3_veriler_sayisi': t3_veriler_sayisi,
         'gonullu_durum_sayisi': gonullu_durum_sayisi,
@@ -42,6 +54,8 @@ def dashboard_home(request):
         'toplam_personel_siparis': toplam_personel_siparis,
         'toplam_taseron_siparis': toplam_taseron_siparis,
         'toplam_t3_siparis': toplam_t3_siparis,
+        'veri_guncelleme_son_saat': veri_guncelleme_son_saat,
+        'veri_guncelleme_son_dakika': veri_guncelleme_son_dakika,
     }
     
     return render(request, 'dashboard/home.html', context)
@@ -283,3 +297,40 @@ def sorumlu_dashboard(request):
     }
     
     return render(request, 'dashboard/sorumlu.html', context)
+
+@login_required
+def sistem_ayarlari_guncelle(request):
+    """Sistem ayarlarını güncelleme view'ı"""
+    if not (request.user.is_superuser or request.user.is_staff):
+        messages.error(request, 'Bu işlemi yapmaya yetkiniz yok.')
+        return redirect('dashboard:home')
+        
+    if request.method == 'POST':
+        veri_guncelleme_son_saat = request.POST.get('veri_guncelleme_son_saat', '14')
+        veri_guncelleme_son_dakika = request.POST.get('veri_guncelleme_son_dakika', '0')
+        
+        # Değerleri kontrol et
+        try:
+            saat = int(veri_guncelleme_son_saat)
+            dakika = int(veri_guncelleme_son_dakika)
+            
+            if not (0 <= saat <= 23 and 0 <= dakika <= 59):
+                raise ValueError("Geçersiz saat veya dakika değeri")
+                
+            # Saat ayarını kaydet
+            SistemAyarlari.objects.update_or_create(
+                anahtar='veri_guncelleme_son_saat',
+                defaults={'deger': str(saat), 'aciklama': 'T3 personel verilerinin güncellenebileceği son saat'}
+            )
+            
+            # Dakika ayarını kaydet
+            SistemAyarlari.objects.update_or_create(
+                anahtar='veri_guncelleme_son_dakika',
+                defaults={'deger': str(dakika), 'aciklama': 'T3 personel verilerinin güncellenebileceği son dakika'}
+            )
+            
+            messages.success(request, 'Sistem ayarları başarıyla güncellendi.')
+        except ValueError:
+            messages.error(request, 'Geçersiz saat veya dakika değeri girdiniz.')
+    
+    return redirect('dashboard:home')

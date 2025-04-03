@@ -9,4 +9,5 @@ urlpatterns = [
     path('gonullu/durum/', views.gonullu_durum_dashboard, name='gonullu_durum'),
     path('gonullu/sorun/', views.gonullu_sorun_dashboard, name='gonullu_sorun'),
     path('sorumlu/', views.sorumlu_dashboard, name='sorumlu'),
+    path('sistem-ayarlari-guncelle/', views.sistem_ayarlari_guncelle, name='sistem_ayarlari_guncelle'),
 ] 
