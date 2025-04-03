@@ -82,3 +82,16 @@ class SorumluVeriler(models.Model):
         verbose_name = 'Sorumlu Verisi'
         verbose_name_plural = 'Sorumlu Verileri'
         db_table = 'sorumlu_veriler'
+
+class SistemAyarlari(models.Model):
+    """Sistem genelinde kullanılan ayarlar"""
+    anahtar = models.CharField(max_length=50, unique=True)
+    deger = models.CharField(max_length=255)
+    aciklama = models.TextField(blank=True, null=True)
+    
+    def __str__(self):
+        return f"{self.anahtar}: {self.deger}"
+    
+    class Meta:
+        verbose_name = "Sistem Ayarı"
+        verbose_name_plural = "Sistem Ayarları"
