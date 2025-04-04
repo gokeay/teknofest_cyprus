@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.db.models import Sum, Count
 from django.utils import timezone
 import csv
@@ -427,3 +427,27 @@ def t3personel_atama_ekle(request):
     }
     
     return render(request, 'dashboard/t3personel_atama_ekle.html', context)
+
+@login_required
+@role_required(['admin'])
+def get_koordinatorluk_for_user(request, user_id):
+    """Kullanıcının mevcut koordinatörlüğünü getir"""
+    try:
+        # Kullanıcının en son atamasını bul
+        atama = T3PersonelAtama.objects.filter(kisi_id=user_id).order_by('-id').first()
+        
+        if atama:
+            return JsonResponse({
+                'success': True,
+                'koordinatorluk': atama.koordinatorluk
+            })
+        else:
+            return JsonResponse({
+                'success': True,
+                'koordinatorluk': None
+            })
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        })

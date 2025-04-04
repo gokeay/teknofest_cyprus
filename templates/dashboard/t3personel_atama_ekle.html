@@ -157,11 +157,17 @@
             const removeBtn = newRow.querySelector('.btn-remove');
             removeBtn.style.display = 'block';
             
-            // Silme butonu işlevselliği
+            // Silme butonu işlevselliği - Yeni eklenen satır için event listener ekle
             removeBtn.addEventListener('click', function() {
                 if (formRows.children.length > 1) {
-                    newRow.remove();
+                    this.closest('.form-row').remove();
                 }
+            });
+            
+            // Kişi seçimi değiştiğinde koordinatörlük bilgisini getir
+            const kisiSelect = newRow.querySelector('select[name="kisi"]');
+            kisiSelect.addEventListener('change', function() {
+                getKoordinatorlukForUser(this);
             });
             
             formRows.appendChild(newRow);
@@ -185,6 +191,39 @@
                 kisiSelect.name = `kisi`;
                 koordinatorlukSelect.name = `koordinatorluk`;
                 birimInput.name = `birim`;
+            });
+        });
+        
+        // Kişi seçimi değiştiğinde koordinatörlük bilgisini getir
+        function getKoordinatorlukForUser(selectElement) {
+            const userId = selectElement.value;
+            if (!userId) return;
+            
+            // AJAX isteği gönder
+            fetch(`/dashboard/t3personel/get-koordinatorluk/${userId}/`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.koordinatorluk) {
+                        // Koordinatörlük seçimini güncelle
+                        const row = selectElement.closest('.form-row');
+                        const koordinatorlukSelect = row.querySelector('select[name="koordinatorluk"]');
+                        
+                        // Seçenekler arasında koordinatörlük var mı kontrol et
+                        const options = Array.from(koordinatorlukSelect.options);
+                        const option = options.find(opt => opt.value === data.koordinatorluk);
+                        
+                        if (option) {
+                            option.selected = true;
+                        }
+                    }
+                })
+                .catch(error => console.error('Koordinatörlük bilgisi alınamadı:', error));
+        }
+        
+        // Mevcut kişi seçimlerine event listener ekle
+        document.querySelectorAll('.form-row select[name="kisi"]').forEach(select => {
+            select.addEventListener('change', function() {
+                getKoordinatorlukForUser(this);
             });
         });
     });
