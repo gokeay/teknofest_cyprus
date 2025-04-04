@@ -11,10 +11,13 @@ from forms.models import (
     GonulluDurumVeriler, 
     GonulluSorunVeriler, 
     SorumluVeriler,
-    SistemAyarlari
+    SistemAyarlari,
+    T3PersonelAtama
 )
 from forms.views import role_required
 from accounts.views import log_user_action
+from accounts.models import User
+from django.shortcuts import get_object_or_404
 
 @login_required
 @role_required(['izleyici', 'admin'])
@@ -334,3 +337,93 @@ def sistem_ayarlari_guncelle(request):
             messages.error(request, 'Geçersiz saat veya dakika değeri girdiniz.')
     
     return redirect('dashboard:home')
+
+@login_required
+@role_required(['admin'])
+def t3personel_atama_ekle(request):
+    """T3 personel ataması ekleme sayfası"""
+    log_user_action(request, 'T3 Personel Atama Ekleme Sayfası Görüntülendi', 'T3 Personel Atama')
+    
+    # T3 personel rolüne sahip kullanıcıları getir
+    users = User.objects.filter(role='t3personel')
+    
+    # Sabit koordinatörlük listesi
+    koordinatorlukler = [
+        "Bilişim Koordinatörlüğü",
+        "Bursiyer Koordinatörlüğü",
+        "Deneyap Koordinatörlüğü",
+        "Eğitim Ar-Ge",
+        "Fuar Koordinatörlüğü",
+        "Girişim Koordinatörlüğü",
+        "İdari İşler Koordinatörlüğü",
+        "Kurumsal İletişim Koordinatörlüğü",
+        "Kurumsal Yapılanma Koordinatörlüğü",
+        "Mimari Tasarım Koordinatörlüğü",
+        "Satış ve Pazarlama Koordinatörlüğü",
+        "Operasyon Koordinatörlüğü",
+        "Ulaşım Koordinatörlüğü",
+        "Yarışmalar Koordinatörlüğü"
+    ]
+    
+    # Veritabanındaki diğer koordinatörlükleri de ekle
+    db_koordinatorlukler = T3PersonelAtama.objects.values_list('koordinatorluk', flat=True).distinct()
+    for k in db_koordinatorlukler:
+        if k not in koordinatorlukler:
+            koordinatorlukler.append(k)
+    
+    # Mevcut atamaları getir
+    atamalar = T3PersonelAtama.objects.all().order_by('kisi__isim', 'kisi__soyisim', 'koordinatorluk', 'birim')
+    
+    if request.method == 'POST':
+        # Form verilerini al
+        kisi_ids = request.POST.getlist('kisi')
+        koordinatorlukler = request.POST.getlist('koordinatorluk')
+        birimler = request.POST.getlist('birim')
+        
+        # Her bir satır için işlem yap
+        basarili_kayit = 0
+        hata_kayit = 0
+        
+        for i in range(len(kisi_ids)):
+            if i < len(koordinatorlukler) and i < len(birimler):
+                try:
+                    kisi = get_object_or_404(User, id=kisi_ids[i])
+                    koordinatorluk = koordinatorlukler[i]
+                    birim = birimler[i]
+                    
+                    # Boş değer kontrolü
+                    if not koordinatorluk or not birim:
+                        hata_kayit += 1
+                        continue
+                    
+                    # Aynı kayıt var mı kontrolü
+                    if T3PersonelAtama.objects.filter(kisi=kisi, koordinatorluk=koordinatorluk, birim=birim).exists():
+                        hata_kayit += 1
+                        continue
+                    
+                    # Yeni atama oluştur
+                    T3PersonelAtama.objects.create(
+                        kisi=kisi,
+                        koordinatorluk=koordinatorluk,
+                        birim=birim
+                    )
+                    basarili_kayit += 1
+                except Exception as e:
+                    hata_kayit += 1
+                    print(f"Hata: {str(e)}")
+        
+        if basarili_kayit > 0:
+            messages.success(request, f'{basarili_kayit} adet T3 personel ataması başarıyla eklendi.')
+        
+        if hata_kayit > 0:
+            messages.warning(request, f'{hata_kayit} adet atama eklenirken hata oluştu.')
+        
+        return redirect('dashboard:t3personel_atama_ekle')
+    
+    context = {
+        'users': users,
+        'koordinatorlukler': koordinatorlukler,
+        'atamalar': atamalar,
+    }
+    
+    return render(request, 'dashboard/t3personel_atama_ekle.html', context)

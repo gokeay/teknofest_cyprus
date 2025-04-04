@@ -156,4 +156,33 @@
         </div>
     </div>
 </div>
+
+{% if user.is_superuser or user.is_staff %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Yönetim İşlemleri</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body text-center">
+                                <i class="fas fa-user-plus fa-3x mb-3 text-primary"></i>
+                                <h5 class="card-title">T3 Personel Ataması</h5>
+                                <p class="card-text">T3 personel için koordinatörlük ve birim ataması yapın.</p>
+                                <a href="{% url 'dashboard:t3personel_atama_ekle' %}" class="btn btn-primary">
+                                    <i class="fas fa-arrow-right me-1"></i>Atama Ekle
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Diğer yönetim kartları buraya eklenebilir -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
 {% endblock %} 
