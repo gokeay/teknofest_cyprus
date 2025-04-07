@@ -48,7 +48,7 @@
                         </div>
                     </div>
                 </form>
-                
+
                 <div class="mt-3">
                     <div class="card-body bg-info-subtle">
                         <strong>Mevcut Ayarlar:</strong>
@@ -69,19 +69,19 @@
             <div class="card-body text-center">
                 <i class="fas fa-users fa-3x mb-3 text-primary"></i>
                 <h5 class="card-title">T3 Personel Verileri</h5>
-                <p class="card-text">
-                    Toplam Kayıt: {{ t3_veriler_sayisi }}<br>
-                    Toplam Öğle Yemeği: {{ toplam_ogle_yemek }}<br>
-                    Toplam Akşam Yemeği: {{ toplam_aksam_yemek }}<br>
-                    Toplam Sipariş: {{ toplam_t3_siparis }}
-                </p>
+                <p class="card-text">Son 7 gün: {{ t3_veriler_sayisi }} kayıt</p>
+
+
+
+
+
                 <a href="{% url 'dashboard:t3personel' %}" class="btn btn-primary">
                     <i class="fas fa-arrow-right me-1"></i>Görüntüle
                 </a>
             </div>
         </div>
     </div>
-    
+
     <div class="col-md-3 mb-3">
         <div class="card shadow-sm slide-in h-100">
             <div class="card-body text-center">
@@ -94,7 +94,7 @@
             </div>
         </div>
     </div>
-    
+
     <div class="col-md-3 mb-3">
         <div class="card shadow-sm slide-in h-100">
             <div class="card-body text-center">
@@ -107,7 +107,7 @@
             </div>
         </div>
     </div>
-    
+
     <div class="col-md-3 mb-3">
         <div class="card shadow-sm slide-in h-100">
             <div class="card-body text-center">
@@ -138,7 +138,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="col-md-4">
                         <div class="card bg-light mb-3">
                             <div class="card-body text-center">
@@ -147,7 +147,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="col-md-4">
                         <div class="card bg-light mb-3">
                             <div class="card-body text-center">
@@ -190,4 +190,3 @@
     </div>
 </div>
 {% endif %}
-{% endblock %} 

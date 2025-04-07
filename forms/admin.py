@@ -4,45 +4,40 @@ from .models import (
     T3PersonelVeriler, 
     GonulluDurumVeriler, 
     GonulluSorunVeriler, 
-    SorumluVeriler,
-    SistemAyarlari
+    SorumluVeriler
+
 )
 
 @admin.register(T3PersonelAtama)
 class T3PersonelAtamaAdmin(admin.ModelAdmin):
     list_display = ('kisi', 'koordinatorluk', 'birim')
-    search_fields = ('kisi__isim', 'kisi__soyisim', 'koordinatorluk', 'birim')
-    list_filter = ('koordinatorluk',)
+    list_filter = ('koordinatorluk', 'birim')
+    search_fields = ('kisi__tc', 'kisi__isim', 'kisi__soyisim', 'koordinatorluk', 'birim')
 
 @admin.register(T3PersonelVeriler)
 class T3PersonelVerilerAdmin(admin.ModelAdmin):
-    list_display = ('kisi', 'koordinatorluk', 'birim', 'ogle_yemek_sayisi', 'aksam_yemek_sayisi', 'submitteddate', 'submittedtime')
-    search_fields = ('kisi__username', 'kisi__first_name', 'kisi__last_name', 'koordinatorluk', 'birim')
-    list_filter = ('submitteddate', 'koordinatorluk', 'birim')
-    date_hierarchy = 'submitteddate'
+    list_display = ('kisi', 'koordinatorluk', 'birim', 'siparis_sayisi', 'submitteddate', 'submittedtime')
+    list_filter = ('koordinatorluk', 'birim', 'submitteddate')
+    search_fields = ('kisi__tc', 'kisi__isim', 'kisi__soyisim', 'koordinatorluk', 'birim')
+    readonly_fields = ('submitteddate', 'submittedtime')
 
 @admin.register(GonulluDurumVeriler)
 class GonulluDurumVerilerAdmin(admin.ModelAdmin):
     list_display = ('kisi', 'gun', 'saat', 'alan', 'submitteddate', 'submittedtime')
-    search_fields = ('kisi__isim', 'kisi__soyisim', 'alan', 'aciklama')
-    list_filter = ('gun', 'alan')
-    date_hierarchy = 'gun'
+    list_filter = ('gun', 'alan', 'submitteddate')
+    search_fields = ('kisi__tc', 'kisi__isim', 'kisi__soyisim', 'alan', 'aciklama')
+    readonly_fields = ('submitteddate', 'submittedtime')
 
 @admin.register(GonulluSorunVeriler)
 class GonulluSorunVerilerAdmin(admin.ModelAdmin):
     list_display = ('kisi', 'gun', 'saat', 'alan', 'submitteddate', 'submittedtime')
-    search_fields = ('kisi__isim', 'kisi__soyisim', 'alan', 'aciklama')
-    list_filter = ('gun', 'alan')
-    date_hierarchy = 'gun'
+    list_filter = ('gun', 'alan', 'submitteddate')
+    search_fields = ('kisi__tc', 'kisi__isim', 'kisi__soyisim', 'alan', 'aciklama')
+    readonly_fields = ('submitteddate', 'submittedtime')
 
 @admin.register(SorumluVeriler)
 class SorumluVerilerAdmin(admin.ModelAdmin):
     list_display = ('kisi', 'gun', 'personel_yemek_siparis', 'taseron_yemek_siparis', 'submitteddate', 'submittedtime')
-    search_fields = ('kisi__isim', 'kisi__soyisim')
-    list_filter = ('gun',)
-    date_hierarchy = 'gun'
-
-@admin.register(SistemAyarlari)
-class SistemAyarlariAdmin(admin.ModelAdmin):
-    list_display = ('anahtar', 'deger', 'aciklama')
-    search_fields = ('anahtar', 'deger', 'aciklama')
+    list_filter = ('gun', 'submitteddate')
+    search_fields = ('kisi__tc', 'kisi__isim', 'kisi__soyisim')
+    readonly_fields = ('submitteddate', 'submittedtime')

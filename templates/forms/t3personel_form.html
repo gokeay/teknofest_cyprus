@@ -26,8 +26,8 @@
                                 <tr>
                                     <th>Koordinatörlük</th>
                                     <th>Birim</th>
-                                    <th>Öğle Yemeği</th>
-                                    <th>Akşam Yemeği</th>
+                                    <th>Sipariş Sayısı</th>
+
                                     <th>Gönderim Zamanı</th>
                                 </tr>
                             </thead>
@@ -36,14 +36,14 @@
                                 <tr>
                                     <td>{{ kayit.koordinatorluk }}</td>
                                     <td>{{ kayit.birim }}</td>
-                                    <td>{{ kayit.ogle_yemek_sayisi }}</td>
-                                    <td>{{ kayit.aksam_yemek_sayisi }}</td>
+                                    <td>{{ kayit.siparis_sayisi }}</td>
+
                                     <td>{{ kayit.submittedtime }}</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
                         </table>
-                        
+
                         {% if saat_uygun %}
                         <div class="d-flex justify-content-end mt-3">
                             <form method="post" action="{% url 'forms:t3personel_form_guncelle' %}">
@@ -61,7 +61,7 @@
                     </div>
                 </div>
                 {% endif %}
-                            
+
                 {% if atamalar and not bugunku_kayitlar %}
                     <form method="post" class="slide-in">
                         {% csrf_token %}
@@ -71,14 +71,26 @@
                                     <h5 class="mb-0">{{ atama.koordinatorluk }} - {{ atama.birim }}</h5>
                                 </div>
                                 <div class="card-body">
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="mb-3">
-                                                <label for="ogle_{{ atama.id }}" class="form-label">Öğle Yemeği Sayısı</label>
-                                                <input type="number" class="form-control" id="ogle_{{ atama.id }}" 
-                                                       name="ogle_{{ atama.id }}" min="0" required>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="mb-3">
-                                                <label for="aksam_{{ atama.id }}" class="form-label">Akş
+                                    <div class="mb-3">
+                                        <label for="siparis_{{ atama.id }}" class="form-label">Sipariş Sayısı</label>
+                                        <input type="number" class="form-control" id="siparis_{{ atama.id }}" name="siparis_{{ atama.id }}" min="0" required>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-1"></i>Kaydet
+                            </button>
+                        </div>
+                    </form>
+                {% elif not atamalar %}
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i>Henüz size atanmış koordinatörlük ve birim bulunmamaktadır. Lütfen yöneticinizle iletişime geçin.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
