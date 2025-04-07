@@ -18,6 +18,7 @@ from forms.views import role_required
 from accounts.views import log_user_action
 from accounts.models import User
 from django.shortcuts import get_object_or_404
+from django.db import models
 
 @login_required
 @role_required(['izleyici', 'admin'])
@@ -25,19 +26,39 @@ def dashboard_home(request):
     """Dashboard ana sayfası"""
     log_user_action(request, 'Dashboard Ana Sayfası Görüntülendi', 'Dashboard Home')
     
-    # Son 7 günlük verileri getir
-    son_7_gun = timezone.now().date() - timedelta(days=7)
+    # Son 7 günlük verileri al
+    son_7_gun = timezone.now() - timezone.timedelta(days=7)
     
-    t3_veriler_sayisi = T3PersonelVeriler.objects.filter(submitteddate__gte=son_7_gun).count()
+    # T3 personel verilerini al
+    t3_veriler = T3PersonelVeriler.objects.filter(submitteddate__gte=son_7_gun)
+    t3_veriler_sayisi = t3_veriler.count()
+    
+    # Toplam öğle ve akşam yemeklerini hesapla
+    toplam_ogle_yemek = t3_veriler.aggregate(
+        toplam=models.Sum('ogle_yemek_sayisi')
+    )['toplam'] or 0
+    
+    toplam_aksam_yemek = t3_veriler.aggregate(
+        toplam=models.Sum('aksam_yemek_sayisi')
+    )['toplam'] or 0
+    
+    toplam_t3_siparis = toplam_ogle_yemek + toplam_aksam_yemek
+
+    # Diğer veriler...
     gonullu_durum_sayisi = GonulluDurumVeriler.objects.filter(submitteddate__gte=son_7_gun).count()
     gonullu_sorun_sayisi = GonulluSorunVeriler.objects.filter(submitteddate__gte=son_7_gun).count()
-    sorumlu_veriler_sayisi = SorumluVeriler.objects.filter(submitteddate__gte=son_7_gun).count()
+    sorumlu_veriler = SorumluVeriler.objects.filter(submitteddate__gte=son_7_gun)
+    sorumlu_veriler_sayisi = sorumlu_veriler.count()
     
-    # Toplam sipariş sayıları
-    toplam_personel_siparis = SorumluVeriler.objects.filter(submitteddate__gte=son_7_gun).aggregate(Sum('personel_yemek_siparis'))['personel_yemek_siparis__sum'] or 0
-    toplam_taseron_siparis = SorumluVeriler.objects.filter(submitteddate__gte=son_7_gun).aggregate(Sum('taseron_yemek_siparis'))['taseron_yemek_siparis__sum'] or 0
-    toplam_t3_siparis = T3PersonelVeriler.objects.filter(submitteddate__gte=son_7_gun).aggregate(Sum('siparis_sayisi'))['siparis_sayisi__sum'] or 0
+    # Toplam personel ve taşeron siparişlerini hesapla
+    toplam_personel_siparis = sorumlu_veriler.aggregate(
+        toplam=models.Sum('personel_yemek_siparis')
+    )['toplam'] or 0
     
+    toplam_taseron_siparis = sorumlu_veriler.aggregate(
+        toplam=models.Sum('taseron_yemek_siparis')
+    )['toplam'] or 0
+
     # Sistem ayarlarını al
     try:
         veri_guncelleme_son_saat = int(SistemAyarlari.objects.get(anahtar='veri_guncelleme_son_saat').deger)
@@ -51,12 +72,14 @@ def dashboard_home(request):
     
     context = {
         't3_veriler_sayisi': t3_veriler_sayisi,
+        'toplam_ogle_yemek': toplam_ogle_yemek,
+        'toplam_aksam_yemek': toplam_aksam_yemek,
+        'toplam_t3_siparis': toplam_t3_siparis,
         'gonullu_durum_sayisi': gonullu_durum_sayisi,
         'gonullu_sorun_sayisi': gonullu_sorun_sayisi,
         'sorumlu_veriler_sayisi': sorumlu_veriler_sayisi,
         'toplam_personel_siparis': toplam_personel_siparis,
         'toplam_taseron_siparis': toplam_taseron_siparis,
-        'toplam_t3_siparis': toplam_t3_siparis,
         'veri_guncelleme_son_saat': veri_guncelleme_son_saat,
         'veri_guncelleme_son_dakika': veri_guncelleme_son_dakika,
     }
@@ -94,16 +117,20 @@ def t3personel_dashboard(request):
         response['Content-Disposition'] = 'attachment; filename="t3personel_veriler.csv"'
         
         writer = csv.writer(response)
-        writer.writerow(['TC', 'İsim', 'Soyisim', 'Koordinatörlük', 'Birim', 'Sipariş Sayısı', 'Tarih', 'Saat'])
+        writer.writerow(['TC', 'İsim', 'Soyisim', 'Koordinatörlük', 'Birim', 
+                        'Öğle Yemeği', 'Akşam Yemeği', 'Toplam', 'Tarih', 'Saat'])
         
         for veri in veriler:
+            toplam = veri.ogle_yemek_sayisi + veri.aksam_yemek_sayisi
             writer.writerow([
                 veri.kisi.tc,
                 veri.kisi.isim,
                 veri.kisi.soyisim,
                 veri.koordinatorluk,
                 veri.birim,
-                veri.siparis_sayisi,
+                veri.ogle_yemek_sayisi,
+                veri.aksam_yemek_sayisi,
+                toplam,
                 veri.submitteddate,
                 veri.submittedtime
             ])

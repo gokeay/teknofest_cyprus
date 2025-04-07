@@ -116,24 +116,23 @@ def t3personel_form(request):
         messages.warning(request, 'Henüz size atanmış koordinatörlük ve birim bulunmamaktadır.')
 
     if request.method == 'POST':
-        # Eğer güncelleme modundaysak veya bugün kayıt yoksa
         if guncelleme_modu:
-            # Önce eski kayıtları sil
             T3PersonelVeriler.objects.filter(kisi=user, submitteddate=bugun).delete()
-            # Güncelleme modunu kapat
             request.session['t3personel_guncelleme_modu'] = False
             
-        # Yeni verileri ekle
         for atama in atamalar:
-            siparis_key = f'siparis_{atama.id}'
-            siparis_sayisi = request.POST.get(siparis_key)
+            ogle_key = f'ogle_{atama.id}'
+            aksam_key = f'aksam_{atama.id}'
+            ogle_sayisi = request.POST.get(ogle_key)
+            aksam_sayisi = request.POST.get(aksam_key)
 
-            if siparis_sayisi and siparis_sayisi.isdigit():
+            if ogle_sayisi and aksam_sayisi and ogle_sayisi.isdigit() and aksam_sayisi.isdigit():
                 T3PersonelVeriler.objects.create(
                     kisi=user,
                     koordinatorluk=atama.koordinatorluk,
                     birim=atama.birim,
-                    siparis_sayisi=int(siparis_sayisi)
+                    ogle_yemek_sayisi=int(ogle_sayisi),
+                    aksam_yemek_sayisi=int(aksam_sayisi)
                 )
 
         log_user_action(request, 'T3 Personel Formu Gönderildi', 'T3 Personel Form')

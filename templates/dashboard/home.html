@@ -69,7 +69,12 @@
             <div class="card-body text-center">
                 <i class="fas fa-users fa-3x mb-3 text-primary"></i>
                 <h5 class="card-title">T3 Personel Verileri</h5>
-                <p class="card-text">Son 7 gün: {{ t3_veriler_sayisi }} kayıt</p>
+                <p class="card-text">
+                    Toplam Kayıt: {{ t3_veriler_sayisi }}<br>
+                    Toplam Öğle Yemeği: {{ toplam_ogle_yemek }}<br>
+                    Toplam Akşam Yemeği: {{ toplam_aksam_yemek }}<br>
+                    Toplam Sipariş: {{ toplam_t3_siparis }}
+                </p>
                 <a href="{% url 'dashboard:t3personel' %}" class="btn btn-primary">
                     <i class="fas fa-arrow-right me-1"></i>Görüntüle
                 </a>

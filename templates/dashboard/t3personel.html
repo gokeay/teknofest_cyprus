@@ -48,13 +48,15 @@
         </form>
         
         <div class="table-responsive">
-            <table class="table table-striped table-hover">
-                <thead class="table-dark">
+            <table class="table">
+                <thead>
                     <tr>
-                        <th>İsim</th>
+                        <th>Personel</th>
                         <th>Koordinatörlük</th>
                         <th>Birim</th>
-                        <th>Sipariş Sayısı</th>
+                        <th>Öğle Yemeği</th>
+                        <th>Akşam Yemeği</th>
+                        <th>Toplam</th>
                         <th>Tarih</th>
                         <th>Saat</th>
                     </tr>
@@ -65,7 +67,9 @@
                         <td>{{ veri.kisi.get_full_name }}</td>
                         <td>{{ veri.koordinatorluk }}</td>
                         <td>{{ veri.birim }}</td>
-                        <td>{{ veri.siparis_sayisi }}</td>
+                        <td>{{ veri.ogle_yemek_sayisi }}</td>
+                        <td>{{ veri.aksam_yemek_sayisi }}</td>
+                        <td>{{ veri.ogle_yemek_sayisi|add:veri.aksam_yemek_sayisi }}</td>
                         <td>{{ veri.submitteddate }}</td>
                         <td>{{ veri.submittedtime }}</td>
                     </tr>
